@@ -1,6 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
 import sys
 import random
-# -*- coding: utf-8 -*-
+import itertools
 
 pieces = ["0 | 0", "1 | 0", "1 | 1", "2 | 0", "2 | 1", "2 | 2", "3 | 0", "3 | 1", "3 | 2",
  "3 | 3", "4 | 0", "4 | 1", "4 | 2", "4 | 3", "4 | 4", "5 | 0", "5 | 1", "5 | 2", "5 | 3", 
@@ -27,11 +29,13 @@ while (n < 25):
 			players[m].append(pieces[p])
 			pieces[p] = ""
 			n = n + 1
-		
+
+'''			
 for i in range(4):
 	print "player " + str(i) + " pieces:"
 	for j in range(6):
 		print players[i][j]
+'''
 		
 pieces = ["0 | 0", "1 | 0", "1 | 1", "2 | 0", "2 | 1", "2 | 2", "3 | 0", "3 | 1", "3 | 2",
  "3 | 3", "4 | 0", "4 | 1", "4 | 2", "4 | 3", "4 | 4", "5 | 0", "5 | 1", "5 | 2", "5 | 3", 
@@ -39,6 +43,7 @@ pieces = ["0 | 0", "1 | 0", "1 | 1", "2 | 0", "2 | 1", "2 | 2", "3 | 0", "3 | 1"
 
 peca = 0
 escolhido = False
+qm_comeca = 0
 while (peca < 7):
 	for i in range(4):
 		for j in range(6):
@@ -65,6 +70,7 @@ while (peca < 7):
 					escolhido = True
 			if(escolhido == True):
 				print "player " + str(i) + " begins"
+				qm_comeca = i
 				break
 		if(escolhido == True):
 			break
@@ -76,7 +82,47 @@ while (peca < 7):
 	
 teamA_score = 0
 teamB_score = 0
-
+teamA = [players[0], players[2]]
+teamB = [players[1], players[3]]
+	
+jogo_comecou = True
+jogadas = 0
+peca_jog = ""
+mod_jog = ""
+pecas_tab = 0
+tabuleiro = []
+modo_tabuleiro = []
+while(jogo_comecou):
+	print "player " + str(qm_comeca) + " pieces"
+	j = 0
+	p = len(players[qm_comeca])
+	for j in range(0, p):
+		print players[qm_comeca][j] + " ",
+	peca_jog = input("piece to play: ")
+	modo_jog = raw_input("modo da peca: ")
+	print ""
+	print ""
+	tabuleiro.append(players[qm_comeca][peca_jog])
+	modo_tabuleiro.append(modo_jog)
+	pecas_tab = pecas_tab + 1
+	players[qm_comeca].pop(peca_jog)
+	i = 0
+	for i in range(pecas_tab):
+		if(modo_tabuleiro[i] == 'n'):
+			print tabuleiro[i] + " ",
+		'''
+		if(modo_tabuleiro[i] == 'v'):
+			for x in zip_longest(*tabuleiro[i].split(), fillvalue=' '):
+				print (' '.join(x)) + " ",
+		'''
+		if(modo_tabuleiro[i] == 'i'):
+			print tabuleiro[i] [::-1] + " ",
+	print ""
+	print ""
+	jogadas = jogadas + 1
+	qm_comeca = qm_comeca + 1
+	if(qm_comeca == 4):
+		qm_comeca = 0
 
 
 
