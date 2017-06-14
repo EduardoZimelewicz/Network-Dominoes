@@ -4,9 +4,9 @@ import sys
 import random
 import itertools
 
-pieces = ["0 | 0", "1 | 0", "1 | 1", "2 | 0", "2 | 1", "2 | 2", "3 | 0", "3 | 1", "3 | 2",
- "3 | 3", "4 | 0", "4 | 1", "4 | 2", "4 | 3", "4 | 4", "5 | 0", "5 | 1", "5 | 2", "5 | 3", 
- "5 | 4", "5 | 5", "6 | 0", "6 | 1", "6 | 2", "6 | 3", "6 | 4", "6 | 5", "6 | 6"]
+pieces = ["0|0", "1|0", "1|1", "2|0", "2|1", "2|2", "3|0", "3|1", "3|2",
+ "3|3", "4|0", "4|1", "4|2", "4|3", "4|4", "5|0", "5|1", "5|2", "5|3", 
+ "5|4", "5|5", "6|0", "6|1", "6|2", "6|3", "6|4", "6|5", "6|6"]
 
 player_A1 = []
 player_A2 = []
@@ -37,9 +37,11 @@ for i in range(4):
 		print players[i][j]
 '''
 		
-pieces = ["0 | 0", "1 | 0", "1 | 1", "2 | 0", "2 | 1", "2 | 2", "3 | 0", "3 | 1", "3 | 2",
- "3 | 3", "4 | 0", "4 | 1", "4 | 2", "4 | 3", "4 | 4", "5 | 0", "5 | 1", "5 | 2", "5 | 3", 
- "5 | 4", "5 | 5", "6 | 0", "6 | 1", "6 | 2", "6 | 3", "6 | 4", "6 | 5", "6 | 6"]
+pieces = ["0|0", "1|0", "1|1", "2|0", "2|1", "2|2", "3|0", "3|1", "3|2",
+ "3|3", "4|0", "4|1", "4|2", "4|3", "4|4", "5|0", "5|1", "5|2", "5|3", 
+ "5|4", "5|5", "6|0", "6|1", "6|2", "6|3", "6|4", "6|5", "6|6"]
+ 
+pieces_equal = ["0|0", "1|1", "2|2", "3|3", "4|4", "5|5", "6|6"]
 
 peca = 0
 escolhido = False
@@ -87,26 +89,44 @@ teamB = [players[1], players[3]]
 	
 jogo_comecou = True
 jogadas = 0
-peca_jog = ""
+peca_jog = 0
 mod_jog = ""
+peca2 = ""
 pecas_tab = 0
 tabuleiro = []
 modo_tabuleiro = []
 while(jogo_comecou):
 	print "player " + str(qm_comeca) + " pieces"
+	
 	j = 0
 	p = len(players[qm_comeca])
 	for j in range(0, p):
 		print players[qm_comeca][j] + " ",
 	peca_jog = input("piece to play: ")
-	modo_jog = raw_input("modo da peca: ")
+	
+	if(peca_jog != 11):
+		modo_jog = raw_input("modo da peca: ")
+		peca = players[qm_comeca][peca_jog]
+		if(jogadas > 0):
+			peca2 = tabuleiro[pecas_tab - 1]
+		if (peca in pieces_equal):
+			if(qm_comeca == 0 or qm_comeca == 2):
+				teamA_score = teamA_score + 2
+			if(qm_comeca == 1 or qm_comeca == 3):
+				teamB_score = teamB_score + 2
+		elif(peca[:1] in peca2 or peca[2:] in peca2):
+			if(qm_comeca == 0 or qm_comeca == 2):
+				teamA_score = teamA_score + 1
+			if(qm_comeca == 1 or qm_comeca == 3):
+				teamB_score = teamB_score + 1
+		tabuleiro.append(peca)
+		modo_tabuleiro.append(modo_jog)
+		pecas_tab = pecas_tab + 1
+		players[qm_comeca].pop(peca_jog)
+		i = 0
+	
 	print ""
 	print ""
-	tabuleiro.append(players[qm_comeca][peca_jog])
-	modo_tabuleiro.append(modo_jog)
-	pecas_tab = pecas_tab + 1
-	players[qm_comeca].pop(peca_jog)
-	i = 0
 	for i in range(pecas_tab):
 		if(modo_tabuleiro[i] == 'n'):
 			print tabuleiro[i] + " ",
@@ -119,11 +139,27 @@ while(jogo_comecou):
 			print tabuleiro[i] [::-1] + " ",
 	print ""
 	print ""
+	
 	jogadas = jogadas + 1
 	qm_comeca = qm_comeca + 1
 	if(qm_comeca == 4):
 		qm_comeca = 0
-
+	
+	print ""
+	print ""
+	
+	print "team A score: " + str(teamA_score)
+	print "team B score: " + str(teamB_score)
+	
+	print ""
+	print ""
+	
+	if(teamA_score == 7):
+		print "Team A wins! "
+		jogo_comecou = False
+	elif(teamB_score == 7):
+		print "Team B wins! "
+		jogo_comecou = False
 
 
 

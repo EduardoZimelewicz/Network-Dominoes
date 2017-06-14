@@ -1,0 +1,16 @@
+4 jogadores
+peças de 1 a 28
+6 pedras para cada participante
+inicia quem tiver maior carroça(mesmo valor nos dois lados da mesma peça)
+prioriza o 6 com 6
+se ninguém tiver, passa pra 5, 4, 3, etc
+coloca a pedra que tenha o mesmo número em uma das pontas
+ganha quem conseguir acabar primeiro com as pedras da mão 
+
+pontuação :
+1 ponto - última pedra serviu
+2 pontos - última pedra tiver dois lados iguais
+3 pontos - cada lado serviu para cada uma das pontas
+4 pontos - dois lados iguais e serviu para as duas pontas
+
+ganha quem fizer 7 pontos
