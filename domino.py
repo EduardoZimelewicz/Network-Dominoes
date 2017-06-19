@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 import sys
+import socket
+from thread import *
 import random
-import itertools
 
+s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s_socket.bind(('',1234))
+s_socket.listen(4)
+	
 pieces = ["0|0", "1|0", "1|1", "2|0", "2|1", "2|2", "3|0", "3|1", "3|2",
  "3|3", "4|0", "4|1", "4|2", "4|3", "4|4", "5|0", "5|1", "5|2", "5|3", 
  "5|4", "5|5", "6|0", "6|1", "6|2", "6|3", "6|4", "6|5", "6|6"]
@@ -13,6 +18,13 @@ player_A2 = []
 player_B1 = []
 player_B2 = []
 players = []
+clientes = []
+
+jogadores = 0
+while (jogadores < 4):
+	conn, addr = s_socket.accept()
+	clientes.append(conn)
+	jogadores = jogadores + 1
 
 players.append(player_A1)
 players.append(player_A2)
@@ -31,12 +43,19 @@ while (n < 25):
 			pieces[p] = ""
 			n = n + 1
 
-'''			
-for i in range(4):
-	print "player " + str(i) + " pieces:"
-	for j in range(6):
-		print players[i][j]
-'''
+acks = 0
+while(acks < 4):
+	data = clientes[acks].recv(3)
+	if(data == "ack"):
+		acks = acks + 1
+
+p = 0
+jo = 0
+for jo in range(4):
+	for p in range(6):
+		MESSAGE = players[jo][p]
+		clientes[jo].send(MESSAGE)
+
 		
 pieces = ["0|0", "1|0", "1|1", "2|0", "2|1", "2|2", "3|0", "3|1", "3|2",
  "3|3", "4|0", "4|1", "4|2", "4|3", "4|4", "5|0", "5|1", "5|2", "5|3", 
@@ -73,7 +92,11 @@ while (peca < 7):
 				if(players[i][j] == pieces[0]):
 					escolhido = True
 			if(escolhido == True):
-				print "player " + str(i) + " begins"
+				for jo in range(4):
+					data = clientes[jo].recv(1)
+					if(data == 'p'):
+						MESSAGE = "player " + str(i) + " begins"
+						clientes[jo].send(MESSAGE)
 				qm_comeca = i
 				break
 		if(escolhido == True):
@@ -91,6 +114,7 @@ teamB_score = 0
 
 #Inicio do jogo
 jogo_comecou = True
+
 jogadas = 0
 peca_jog = 0
 mod_jog = ""
@@ -100,33 +124,58 @@ peca3 = ""
 pecas_tab = 0
 tabuleiro = []
 modo_tabuleiro = []
+
+for jo in range(4):
+	data = clientes[jo].recv(1)
+	if(data == 'c'):
+		clientes[jo].send('1')
+
 while(jogo_comecou):
-	print "player " + str(qm_comeca) + " pieces"
+	#print "player " + str(qm_comeca) + " pieces"
 	
 	j = 0
 	p = len(players[qm_comeca])
 	
 	if(p == 0):
+		jo = 0
 		if(qm_comeca == 0 or qm_comeca == 2):
-			print "Time A ganhou!"
+			for jo in range(4):
+				clientes[jo].send("Team A wins!")
 		if(qm_comeca == 1 or qm_comeca == 3):
-			print "Time B ganhou!"
+			for jo in range(4):
+				clientes[jo].send("Team B wins!")
 		jogo_comecou = False
 		
 	else:
-		for j in range(0, p):
-			print players[qm_comeca][j] + " ",
-		peca_jog = input("peca para jogar: ")	
+		j = 0
+		for j in range(4):
+			data = clientes[j].recv(1)
+			if(data == 'j'):
+				if(j == qm_comeca):
+					clientes[j].send('1')
+				else:
+					clientes[j].send('0')
 		
-		if(peca_jog != 11):
-			modo_jog = raw_input("modo da peca: ") #Colocar na pos normal ou invertida
-			ponta_tab = raw_input("ponta: ") #Colocar na ponta esq ou dir
+		data = clientes[qm_comeca].recv(1)
+		if(data == 'e'):
+			clientes[qm_comeca].send("Voce joga, escolha a peca:")
+			peca_jog = int(clientes[qm_comeca].recv(1))
+		
+		if(peca_jog != 6):
+			data = clientes[qm_comeca].recv(1)
+			if(data == 'm'):
+				clientes[qm_comeca].send("modo da peca:")
+				modo_jog = clientes[qm_comeca].recv(1) #Colocar na pos normal ou invertida
+			data = clientes[qm_comeca].recv(1)
+			if(data == 'p'):
+				clientes[qm_comeca].send("ponta:")
+				ponta_tab = clientes[qm_comeca].recv(1)#Colocar na ponta esq ou dir
 			peca = players[qm_comeca][peca_jog]
 			
 			if(jogadas > 0):
 				peca2 = tabuleiro[pecas_tab - 1]
 			
-			if(len(tabuleiro) >= 1):
+			if(len(tabuleiro) >= 2):
 				peca3 = tabuleiro[0]
 			
 			#Se a peça tiver lados iguais
@@ -144,10 +193,11 @@ while(jogo_comecou):
 						teamB_score = teamB_score + 2
 			
 			#Se a peça tiver um lado igual a ponta da direita
-			elif(peca[:1] in peca2 or peca[2:] in peca2):
+			elif((peca[:1] in peca2 or peca[2:] in peca2) or (peca[:1] in peca3 or peca[2:] in peca3)):
 				#Se a peça tiver o lado dir igual a ponta esq e o lado esq igual a ponta dir
 				#Ou se a peça tiver o lado esq igual a ponta esq e o lado dir igual a ponta dir 
 				if((peca[:1] in peca2 and peca[2:] in peca3) or (peca[:1] in peca3 and peca[2:] in peca2)):
+					print peca 
 					if(qm_comeca == 0 or qm_comeca == 2):
 						teamA_score = teamA_score + 3
 					if(qm_comeca == 1 or qm_comeca == 3):
@@ -160,26 +210,59 @@ while(jogo_comecou):
 			
 			#Colocar na ponta esq ou direita do tabuleiro
 			if(ponta_tab == 'd'):
-				tabuleiro.append(peca)
-				modo_tabuleiro.append(modo_jog)
-			elif(ponta_tab == 'e'):
-				tabuleiro.insert(0, peca)
-				modo_tabuleiro.insert(0, modo_jog)
+				if(modo_jog == 'n'):
+					tabuleiro.append(peca)
+				if(modo_jog == 'i'):
+					tabuleiro.append(peca[::-1])
+				#modo_tabuleiro.append(modo_jog)
+			if(ponta_tab == 'e'):
+				if(modo_jog == 'n'):
+					tabuleiro.insert(0, peca)
+				if(modo_jog == 'i'):
+					tabuleiro.insert(0, peca[::-1])
+				#modo_tabuleiro.insert(0, modo_jog)
 			
 			pecas_tab = pecas_tab + 1
+			
 			players[qm_comeca].pop(peca_jog)
-			i = 0
 		
-		print ""
-		print ""
-		for i in range(pecas_tab):
-			if(modo_tabuleiro[i] == 'n'):
-				print tabuleiro[i] + " ",
-
-			if(modo_tabuleiro[i] == 'i'):
-				print tabuleiro[i] [::-1] + " ",
-		print ""
-		print ""
+		pecas_tab1 = str(pecas_tab)
+		jo = 0
+		for jo in range(4):
+			data = clientes[jo].recv(1)
+			if(data == 't'):
+				clientes[jo].send(pecas_tab1)
+		
+		if(peca_jog != 6):
+			if(jogadas == 0):
+				jo = 0
+				for jo in range(4):
+					data = clientes[jo].recv(3)
+					if(data == "tab"):
+						clientes[jo].send(tabuleiro[0])
+			
+			elif(jogadas >= 1):
+				jo = 0
+				for jo in range(4):
+					i = 0
+					for i in range(pecas_tab):
+						data = clientes[jo].recv(3)
+						if(data == "tab"):
+							clientes[jo].send(tabuleiro[i])
+		
+		jo = 0
+		for jo in range(4):
+			data = clientes[jo].recv(1)
+			if(data == 'a'):
+				clientes[jo].send(str(teamA_score))
+		jo = 0
+		for jo in range(4):
+			data = clientes[jo].recv(1)
+			if(data == 'b'):
+				clientes[jo].send(str(teamB_score))
+		
+		print "A:" + str(teamA_score)
+		print "B:" + str(teamB_score)
 		
 		jogadas = jogadas + 1
 		qm_comeca = qm_comeca + 1
@@ -189,21 +272,15 @@ while(jogo_comecou):
 			qm_comeca = 0
 		
 		if(teamA_score >= 7):
-			print "Time B ganhou! "
+			#for jo in range(4):
+				#clientes[jo].send("Team A wins!")
 			jogo_comecou = False
 		elif(teamB_score >= 7):
-			print "Time B ganhou! "
+			#for jo in range(4):
+				#clientes[jo].send("Team B wins!")
 			jogo_comecou = False
-		
-		print ""
-		print ""
-		
-	print "Pontos time A: " + str(teamA_score)
-	print "Pontos time B: " + str(teamB_score)
-	
-	print ""
-	print ""
-	
 
+s_socket.close()
+	
 
 

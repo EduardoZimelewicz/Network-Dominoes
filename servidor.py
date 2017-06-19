@@ -8,7 +8,7 @@ server_socket.bind(('', 1234))
 server_socket.listen(5)
 
 def clientthread(conn):
-    conn.send('Bem vindo. Mande uma mensagem')
+    conn.send('Bem vindo ao jogo Domino Mania. Estas sao suas pecas')
     
     while True:
         data = conn.recv(1024)
