@@ -66,7 +66,7 @@ while (jogo_comecou):
 		pecas_tab = server_socket.recv(1)
 		pecas_tab = int(pecas_tab)
 		
-		if(peca_escolh != 6 and jogadas >= 0):
+		if(jogadas >= 0):
 			print ""
 			print ""
 			tabuleiro[:] = []

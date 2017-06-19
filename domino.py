@@ -233,22 +233,21 @@ while(jogo_comecou):
 			if(data == 't'):
 				clientes[jo].send(pecas_tab1)
 		
-		if(peca_jog != 6):
-			if(jogadas == 0):
-				jo = 0
-				for jo in range(4):
+		if(jogadas == 0):
+			jo = 0
+			for jo in range(4):
+				data = clientes[jo].recv(3)
+				if(data == "tab"):
+					clientes[jo].send(tabuleiro[0])
+		
+		elif(jogadas >= 1):
+			jo = 0
+			for jo in range(4):
+				i = 0
+				for i in range(pecas_tab):
 					data = clientes[jo].recv(3)
 					if(data == "tab"):
-						clientes[jo].send(tabuleiro[0])
-			
-			elif(jogadas >= 1):
-				jo = 0
-				for jo in range(4):
-					i = 0
-					for i in range(pecas_tab):
-						data = clientes[jo].recv(3)
-						if(data == "tab"):
-							clientes[jo].send(tabuleiro[i])
+						clientes[jo].send(tabuleiro[i])
 		
 		jo = 0
 		for jo in range(4):
