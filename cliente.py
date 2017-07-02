@@ -1,5 +1,7 @@
 import socket 
 import sys
+import pygame
+import time
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_address = ('localhost', 1234)
@@ -10,29 +12,42 @@ pieces = []
 tabuleiro = []
 piecesA = 6
 jogadas = 0
+idJogador = 0
 
-server_socket.send("ack")
+server_socket.send('ack')
 
 while(i < 6):
 	data = server_socket.recv(3)
 	pieces.append(data)
 	i = i + 1
 
+#requisita id de jogador
+server_socket.send('ack')
+
+idJogador = server_socket.recv(1);
+print "Voce e o jogador " + idJogador
+
 server_socket.send('p')
-qm_comeca = server_socket.recv(15)
+qm_comeca = server_socket.recv(16)
 print qm_comeca
 
 server_socket.send('c')
 jogo_comecou = int (server_socket.recv(1))
 
-while (jogo_comecou):
+while (jogo_comecou):	
 	i = len(pieces)
 	j = 0
 	peca_escolh = 0
+	print "Numero de pecas de cada jogador"
+	server_socket.send("pe")
+	for i in range (4):
+		info = server_socket.recv(1)
+		print "jogador " + str(i) + " tem " + info + " pecas "
+	
 	print "Essas sao suas pecas: "
 	for j in range(piecesA):
 		print pieces[j] + " ",
-	print ""
+	print("")
 	
 	if(i == 0):
 		info = server_socket.recv(11)
@@ -70,10 +85,11 @@ while (jogo_comecou):
 			print ""
 			print ""
 			tabuleiro[:] = []
+			print "tabuleiro: "
 			if(pecas_tab == 0):
 				server_socket.send("tab")
 				tabuleiro.append(server_socket.recv(3))
-				print tabuleiro[0] + " ", 
+				print tabuleiro[0] + " ",
 			if(pecas_tab > 0):
 				k = 0
 				for k in range(pecas_tab):

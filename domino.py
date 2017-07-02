@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*- 
 import sys
 import socket
-from thread import *
 import random
 
 s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,7 +54,9 @@ for jo in range(4):
 	for p in range(6):
 		MESSAGE = players[jo][p]
 		clientes[jo].send(MESSAGE)
-
+	#envia id jogador jo
+	clientes[jo].recv(3)
+	clientes[jo].send(str(jo))
 		
 pieces = ["0|0", "1|0", "1|1", "2|0", "2|1", "2|2", "3|0", "3|1", "3|2",
  "3|3", "4|0", "4|1", "4|2", "4|3", "4|4", "5|0", "5|1", "5|2", "5|3", 
@@ -95,8 +96,8 @@ while (peca < 7):
 				for jo in range(4):
 					data = clientes[jo].recv(1)
 					if(data == 'p'):
-						MESSAGE = "player " + str(i) + " begins"
-						clientes[jo].send(MESSAGE)
+						MESSAGE = "jogador " + str(i) + " comeca"
+						clientes[jo].send(MESSAGE)						
 				qm_comeca = i
 				break
 		if(escolhido == True):
@@ -131,7 +132,15 @@ for jo in range(4):
 		clientes[jo].send('1')
 
 while(jogo_comecou):
-	#print "player " + str(qm_comeca) + " pieces"
+	jo = 0
+	i = 0
+	for jo in range(4):
+		data = clientes[jo].recv(2)
+		i = 0
+		for i in range(4):
+			if(data == "pe"):
+				n = str(len(players[i]))
+				clientes[jo].send(n)
 	
 	j = 0
 	p = len(players[qm_comeca])
@@ -197,7 +206,6 @@ while(jogo_comecou):
 				#Se a peça tiver o lado dir igual a ponta esq e o lado esq igual a ponta dir
 				#Ou se a peça tiver o lado esq igual a ponta esq e o lado dir igual a ponta dir 
 				if((peca[:1] in peca2 and peca[2:] in peca3) or (peca[:1] in peca3 and peca[2:] in peca2)):
-					print peca 
 					if(qm_comeca == 0 or qm_comeca == 2):
 						teamA_score = teamA_score + 3
 					if(qm_comeca == 1 or qm_comeca == 3):
