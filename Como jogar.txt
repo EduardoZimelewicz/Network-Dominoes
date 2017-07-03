@@ -1,0 +1,35 @@
+************************************PROJETO DOMINÓ MANIA****************************************************
+
+Escolha de peça:
+
+Para escolher uma peça o jogador deve digitar um número de 0 até o número de peças que ele possui menos 1.
+
+Exemplo: número de peças 5, deve escolher um número de 0 à 4.
+
+Caso o jogador digite o número 6 então este passará a vez.
+
+************************************************************************************************************
+
+Modo da peça:
+
+Para o jogador escolher o modo de peça "normal" deve digitar "n"
+
+Para o jogador escolher o modo de peça "invertido" deve digitar "i"
+
+O modo de peça normal significa que não será necessária a inversão da posição da peça.
+Ex: 6|0 -> 6|0
+
+O modo de peça invertida significa que será necessária a inversão da posição da peça.
+Ex: 6|0 -> 0|6
+
+************************************************************************************************************
+
+Ponta:
+
+Para o jogador escolher a ponta do tabulheiro na qual deseja colocar a peça ele deve digitar:
+
+- "e" para ponta esquerda
+- "d" para ponta direita
+
+
+
